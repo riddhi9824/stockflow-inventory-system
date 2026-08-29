@@ -5,6 +5,29 @@ import { getProducts } from "../services/productService";
 
 function Dashboard() {
     const [products, setProducts] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const totalProducts = products.length;
+
+    const totalStock = products.reduce(
+        (total, product) => total + product.stock,
+        0
+    );
+
+    const lowStockProducts = products.filter(
+        (product) => product.stock <= product.lowStockAlert
+    ).length;
+
+    const inventoryValue = products.reduce(
+        (total, product) => total + (product.costPrice * product.stock),
+        0
+    );
+
+    const filteredProducts = products.filter((product) => 
+       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       product.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     useEffect(() => {
         fetchProducts();
@@ -78,17 +101,55 @@ function Dashboard() {
                         Product Management
                     </h2>
 
-                    <button className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">
+                    <Link
+                       to="/products"
+                       className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
+                    >
                         + Add Product
-                    </button>
+                    </Link>
+                </div>
+
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+                    <div className="bg-white p-6 rounded-xl shadow">
+                        <p className="text-gray-500">Total Products</p>
+                        <h3 className="text-3xl font-bold mt-2">
+                            {totalProducts}
+                        </h3>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl shadow">
+                        <p className="text-gray-500">Total Stock</p>
+                        <h3 className="text-3xl font-bold mt-2">
+                            {totalStock}
+                        </h3>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl shadow">
+                        <p className="text-gray-500">Low Stock Items</p>
+                        <h3 className="text-3xl font-bold mt-2">
+                            {lowStockProducts}
+                        </h3>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl shadow">
+                        <p className="text-gray-500">Inventory Value</p>
+                        <h3 className="text-3xl font-bold mt-2">
+                            ₹{inventoryValue}
+                        </h3>
+                    </div>
+
                 </div>
 
                 {/* Search */}
                 <div className="bg-white rounded-xl shadow p-4 mb-6">
                     <input
-                     type="text"
-                     placeholder="Search products..."
-                     className="w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none"
+                       type="text"
+                       placeholder="Search products..."
+                       value={searchTerm}
+                       onChange={(e) => setSearchTerm(e.target.value)}
+                       className="w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none"
                     />
                 </div>
 
@@ -114,7 +175,7 @@ function Dashboard() {
                                     </td>
                                 </tr>
                             ) : (
-                                products.map((product) => (
+                                filteredProducts.map((product) => (
                                     <tr key={product._id} className="border-t hover:bg-gray-50">
                                         <td className="p-4 font-medium">{product.name}</td>
 
@@ -122,7 +183,7 @@ function Dashboard() {
 
                                         <td className="p-4">{product.sellingPrice}</td>
 
-                                        <td className="p-4">product.stock</td>
+                                        <td className="p-4">{product.stock}</td>
 
                                         <td className="p-4">
                                             <span 
