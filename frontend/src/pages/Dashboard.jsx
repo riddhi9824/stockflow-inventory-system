@@ -1,5 +1,164 @@
-function Dashboard(){
-    return <h1>Dashboard</h1>;
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { getProducts } from "../services/productService";
+
+function Dashboard() {
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            const response = await getProducts();
+            setProducts(response.data.data);
+        } catch (error){
+            console.error("Error fetching products: ", error);
+        }
+    };
+    const handleDelete = async (id) => {
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete this product?"
+        );
+
+        if(!confirmDelete) return;
+
+        try {
+            await axios.delete(`http://localhost:5001/api/products/${id}`);
+
+            setProducts((prevProducts) => 
+                prevProducts.filter((product) => product._id !== id)
+        );
+
+        alert("Product deleted successfully");
+        } catch (error) {
+            console.error("Delete error:", error);
+            alert("Failed to delete product");
+        }
+    };
+    return(
+        <div className= "min-h-screen bg-gray-100 flex">
+
+            {/* Sidebar */}
+            <aside className= "w-64 bg-slate-900 text-white p-6">
+                <h1 className="text-2xl font-bold text-blue-400 mb-10">
+                    StockFlow
+                </h1>
+
+                <nav className="space-y-4">
+                    <button className="block w-full text-left px-3 py-2 rounded-lg bg-blue-600">
+                        Dashboard
+                    </button>
+
+                    <button className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800">
+                        Products
+                    </button>
+
+                    <button className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800">
+                        Billing
+                    </button>
+
+                    <button className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800">
+                        Reports
+                    </button>
+                </nav>
+            </aside>
+
+            {/* Main Content */}
+            <main className="flex-1 p-8">
+
+                {/* Top Bar */}
+                <div className="flex justify-between items-center mb-8">
+                    <h2 className="text-3xl font-bold">
+                        Product Management
+                    </h2>
+
+                    <button className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">
+                        + Add Product
+                    </button>
+                </div>
+
+                {/* Search */}
+                <div className="bg-white rounded-xl shadow p-4 mb-6">
+                    <input
+                     type="text"
+                     placeholder="Search products..."
+                     className="w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none"
+                    />
+                </div>
+
+                {/* Product Table */}
+                <div className="bg-white rounded-xl shadow overflow-hidden">
+                    <table className="w-full">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="text-left p-4">Product</th>
+                                <th className="text-left p-4">Category</th>
+                                <th className="text-left p-4">Price</th>
+                                <th className="text-left p-4">Stock</th>
+                                <th className="text-left p-4">Status</th>
+                                <th className="text-left p-4">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {products.length === 0 ? (
+                                <tr>
+                                    <td colSpan="6" className="text-center p-6 text-gray-500">
+                                        No products found.
+                                    </td>
+                                </tr>
+                            ) : (
+                                products.map((product) => (
+                                    <tr key={product._id} className="border-t hover:bg-gray-50">
+                                        <td className="p-4 font-medium">{product.name}</td>
+
+                                        <td className="p-4">{product.category}</td>
+
+                                        <td className="p-4">{product.sellingPrice}</td>
+
+                                        <td className="p-4">product.stock</td>
+
+                                        <td className="p-4">
+                                            <span 
+                                               className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                                 product.stock <= product.lowStockAlert
+                                                 ? "bg-red-100 text-red-700"
+                                                 : "bg-green-100 text-green-700"
+                                               }`}
+                                            >
+                                                {product.stock <= product.lowStockAlert
+                                                ? "Low Stock"
+                                                : "In Stock"}
+                                            </span>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex gap-2">
+                                                <button
+                                                   className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                   onClick={() => handleEdit(product)}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                   className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                                   onClick={() => handleDelete(product._id)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+            </main>
+        </div>
+    );
 }
 
 export default Dashboard;

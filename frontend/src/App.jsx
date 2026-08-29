@@ -10,7 +10,7 @@ import NotFound from "./pages/NotFound";
 function App(){
   return(
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<Dashboard />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/products" element={<Products />} />
       <Route path="/billing" element={<Billing />} />
