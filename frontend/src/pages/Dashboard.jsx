@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { getProducts } from "../services/productService";
 
 function Dashboard() {
@@ -51,9 +52,12 @@ function Dashboard() {
                         Dashboard
                     </button>
 
-                    <button className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800">
+                    <Link 
+                       to="/products"
+                       className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
+                    >
                         Products
-                    </button>
+                      </Link>
 
                     <button className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800">
                         Billing
