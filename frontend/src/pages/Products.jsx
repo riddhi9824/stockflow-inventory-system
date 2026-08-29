@@ -168,11 +168,8 @@ function Products() {
 
                 <button
                     onClick={() => {
-                        if (showForm) {
-                            resetForm();
-                        } else {
-                            setShowForm(true);
-                        }
+                        resetForm();
+                        setShowForm(true);
                     }}
                     className="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700"
                 >
