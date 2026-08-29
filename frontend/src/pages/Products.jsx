@@ -4,6 +4,7 @@ import axios from "axios";
 function Products() {
     const [products, setProducts] = useState([]);
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState(null);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -41,46 +42,66 @@ function Products() {
         });
     };
 
-    // Add product
+    // Add / Update Product
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            await axios.post(
-                "http://localhost:5001/api/products",
-                {
-                    ...formData,
-                    costPrice: Number(formData.costPrice),
-                    sellingPrice: Number(formData.sellingPrice),
-                    stock: Number(formData.stock),
-                    lowStockAlert: Number(formData.lowStockAlert),
-                }
-            );
+            const productData = {
+                ...formData,
+                costPrice: Number(formData.costPrice),
+                sellingPrice: Number(formData.sellingPrice),
+                stock: Number(formData.stock),
+                lowStockAlert: Number(formData.lowStockAlert),
+            };
 
-            alert("Product added successfully!");
+            if (editingId) {
+                // Update product
+                await axios.put(
+                    `http://localhost:5001/api/products/${editingId}`,
+                    productData
+                );
 
-            setFormData({
-                name: "",
-                sku: "",
-                barcode: "",
-                category: "",
-                costPrice: "",
-                sellingPrice: "",
-                stock: "",
-                lowStockAlert: 5,
-            });
+                alert("Product updated successfully!");
+            } else {
+                // Add product
+                await axios.post(
+                    "http://localhost:5001/api/products",
+                    productData
+                );
 
-            setShowForm(false);
+                alert("Product added successfully!");
+            }
+
+            resetForm();
             fetchProducts();
 
         } catch (error) {
-            console.error("Error adding product:", error);
+            console.error("Error saving product:", error);
 
             alert(
                 error.response?.data?.message ||
-                "Failed to add product"
+                "Failed to save product"
             );
         }
+    };
+
+    // Edit product
+    const handleEdit = (product) => {
+        setEditingId(product._id);
+
+        setFormData({
+            name: product.name,
+            sku: product.sku,
+            barcode: product.barcode || "",
+            category: product.category,
+            costPrice: product.costPrice,
+            sellingPrice: product.sellingPrice,
+            stock: product.stock,
+            lowStockAlert: product.lowStockAlert,
+        });
+
+        setShowForm(true);
     };
 
     // Delete product
@@ -106,6 +127,23 @@ function Products() {
         }
     };
 
+    // Reset form
+    const resetForm = () => {
+        setFormData({
+            name: "",
+            sku: "",
+            barcode: "",
+            category: "",
+            costPrice: "",
+            sellingPrice: "",
+            stock: "",
+            lowStockAlert: 5,
+        });
+
+        setEditingId(null);
+        setShowForm(false);
+    };
+
     return (
         <div className="min-h-screen bg-gray-100 p-8">
 
@@ -122,19 +160,25 @@ function Products() {
                 </div>
 
                 <button
-                    onClick={() => setShowForm(!showForm)}
+                    onClick={() => {
+                        if (showForm) {
+                            resetForm();
+                        } else {
+                            setShowForm(true);
+                        }
+                    }}
                     className="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700"
                 >
                     {showForm ? "Close Form" : "+ Add Product"}
                 </button>
             </div>
 
-            {/* Add Product Form */}
+            {/* Add / Edit Product Form */}
             {showForm && (
                 <div className="bg-white p-6 rounded-xl shadow mb-8">
 
                     <h2 className="text-xl font-semibold mb-5">
-                        Add New Product
+                        {editingId ? "Edit Product" : "Add New Product"}
                     </h2>
 
                     <form
@@ -228,7 +272,7 @@ function Products() {
                             type="submit"
                             className="md:col-span-2 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700"
                         >
-                            Add Product
+                            {editingId ? "Update Product" : "Add Product"}
                         </button>
 
                     </form>
@@ -255,37 +299,14 @@ function Products() {
 
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="text-left p-4">
-                                        Product
-                                    </th>
-
-                                    <th className="text-left p-4">
-                                        SKU
-                                    </th>
-
-                                    <th className="text-left p-4">
-                                        Category
-                                    </th>
-
-                                    <th className="text-left p-4">
-                                        Cost Price
-                                    </th>
-
-                                    <th className="text-left p-4">
-                                        Selling Price
-                                    </th>
-
-                                    <th className="text-left p-4">
-                                        Stock
-                                    </th>
-
-                                    <th className="text-left p-4">
-                                        Status
-                                    </th>
-
-                                    <th className="text-left p-4">
-                                        Action
-                                    </th>
+                                    <th className="text-left p-4">Product</th>
+                                    <th className="text-left p-4">SKU</th>
+                                    <th className="text-left p-4">Category</th>
+                                    <th className="text-left p-4">Cost Price</th>
+                                    <th className="text-left p-4">Selling Price</th>
+                                    <th className="text-left p-4">Stock</th>
+                                    <th className="text-left p-4">Status</th>
+                                    <th className="text-left p-4">Action</th>
                                 </tr>
                             </thead>
 
@@ -294,13 +315,12 @@ function Products() {
                                 {products.map((product) => {
 
                                     const isLowStock =
-                                        product.stock <=
-                                        product.lowStockAlert;
+                                        product.stock <= product.lowStockAlert;
 
                                     return (
                                         <tr
                                             key={product._id}
-                                            className="border-t"
+                                            className="border-t hover:bg-gray-50"
                                         >
 
                                             <td className="p-4 font-medium">
@@ -328,7 +348,6 @@ function Products() {
                                             </td>
 
                                             <td className="p-4">
-
                                                 <span
                                                     className={
                                                         isLowStock
@@ -340,20 +359,30 @@ function Products() {
                                                         ? "Low Stock"
                                                         : "In Stock"}
                                                 </span>
-
                                             </td>
 
                                             <td className="p-4">
+                                                <div className="flex gap-2">
 
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(product._id)
-                                                    }
-                                                    className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700"
-                                                >
-                                                    Delete
-                                                </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleEdit(product)
+                                                        }
+                                                        className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700"
+                                                    >
+                                                        Edit
+                                                    </button>
 
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDelete(product._id)
+                                                        }
+                                                        className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700"
+                                                    >
+                                                        Delete
+                                                    </button>
+
+                                                </div>
                                             </td>
 
                                         </tr>
