@@ -1,4 +1,5 @@
 const productRoutes = require("./routes/productRoutes");
+const saleRoutes = require("./routes/saleRoutes");
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/products", productRoutes);
+app.use("/api/sales", saleRoutes);
 
 //Test Route
 app.get("/", (req, res) => {
