@@ -3,6 +3,7 @@ import axios from "axios";
 
 function Products() {
     const [products, setProducts] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
@@ -33,6 +34,12 @@ function Products() {
     useEffect(() => {
         fetchProducts();
     }, []);
+    
+    const filteredProducts = products.filter((product) => 
+       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       product.category.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
     // Handle form input
     const handleChange = (e) => {
@@ -279,6 +286,16 @@ function Products() {
                 </div>
             )}
 
+            <div className="bg-white p-4 rounded-xl shadow mb-6">
+                <input 
+                    type="text"
+                    placeholder="Search by name, SKU or category..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none"
+                />
+            </div>
+
             {/* Product Table */}
             <div className="bg-white rounded-xl shadow overflow-hidden">
 
@@ -312,7 +329,7 @@ function Products() {
 
                             <tbody>
 
-                                {products.map((product) => {
+                                {filteredProducts.map((product) => {
 
                                     const isLowStock =
                                         product.stock <= product.lowStockAlert;
