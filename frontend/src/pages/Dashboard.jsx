@@ -82,13 +82,19 @@ function Dashboard() {
                         Products
                       </Link>
 
-                    <button className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800">
+                    <Link
+                       to="/billing"
+                       className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
+                    >
                         Billing
-                    </button>
+                    </Link>
 
-                    <button className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800">
+                    <Link
+                        to="/reports" 
+                        className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
+                    >
                         Reports
-                    </button>
+                    </Link>
                 </nav>
             </aside>
 
@@ -168,7 +174,7 @@ function Dashboard() {
                         </thead>
 
                         <tbody>
-                            {products.length === 0 ? (
+                            {filteredProducts.length === 0 ? (
                                 <tr>
                                     <td colSpan="6" className="text-center p-6 text-gray-500">
                                         No products found.
@@ -200,12 +206,12 @@ function Dashboard() {
                                         </td>
                                         <td className="p-4">
                                             <div className="flex gap-2">
-                                                <button
+                                                <Link
+                                                   to="/products"
                                                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                                   onClick={() => handleEdit(product)}
                                                 >
                                                     Edit
-                                                </button>
+                                                </Link>
                                                 <button
                                                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                                                    onClick={() => handleDelete(product._id)}
