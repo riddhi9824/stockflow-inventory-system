@@ -4,6 +4,24 @@ import axios from "axios";
 function Reports() {
     const [sales, setSales] = useState([]);
 
+    const totalRevenue = sales.reduce(
+        (total, sale) => total + sale.total,
+        0
+    );
+
+    const totalCost = sales.reduce(
+        (total, sale) => 
+            total + 
+            sale.items.reduce(
+                (itemTotal, item) =>
+                    itemTotal + item.costPrice * item.quantity,
+                    0
+            ),
+            0
+    );
+
+    const totalProfit = totalRevenue - totalCost;
+
     const fetchSales = async () => {
         try {
             const response = await axios.get(
@@ -35,7 +53,7 @@ function Reports() {
             </div>
 
             {/* Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
                 <div className="bg-white rounded-xl shadow p-6">
                     <p className="text-gray-500">
@@ -49,15 +67,11 @@ function Reports() {
 
                 <div className="bg-white rounded-xl shadow p-6">
                     <p className="text-gray-500">
-                        Total Sales
+                        Total Revenue
                     </p>
 
                     <h2 className="text-3xl font-bold mt-2">
-                        ₹
-                        {sales.reduce(
-                            (total, sale) => total + sale.total,
-                            0
-                        )}
+                        ₹{totalRevenue}
                     </h2>
                 </div>
 
@@ -77,6 +91,16 @@ function Reports() {
                                 ),
                             0
                         )}
+                    </h2>
+                </div>
+
+                <div className="bg-white rounded-xl shadow p-6">
+                    <p className="text-gray-500">
+                        Total Profit
+                    </p>
+
+                    <h2 className="text-3xl font-bold mt-2">
+                        ₹{totalProfit}
                     </h2>
                 </div>
 

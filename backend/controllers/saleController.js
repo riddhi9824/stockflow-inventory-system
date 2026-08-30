@@ -42,6 +42,7 @@ const createSale = async(req, res) => {
                 product: product._id,
                 name: product.name,
                 price: product.sellingPrice,
+                costPrice: product.costPrice,
                 quantity: item.quantity,
                 total: itemTotal,
             });
