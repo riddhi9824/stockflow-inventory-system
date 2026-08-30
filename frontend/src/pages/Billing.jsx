@@ -5,6 +5,7 @@ function Billing() {
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [cart, setCart] = useState([]);
+    const [generatedBill, setGeneratedBill] = useState(null);
 
     // Fetch products
     const fetchProducts = async () => {
@@ -74,10 +75,12 @@ function Billing() {
                 })),
             };
 
-            await axios.post(
+            const response = await axios.post(
                 "http://localhost:5001/api/sales",
                 saleData
             );
+
+            setGeneratedBill(response.data.data);
 
             alert("Bill generated successfully!");
 
@@ -297,6 +300,112 @@ function Billing() {
                 </div>
 
             </div>
+
+            {/* Generated Invoice */}
+            {generatedBill && (
+                <div className="mt-8 bg-white rounded-xl shadow p-8">
+
+                    <div className="flex justify-between items-start mb-8">
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-800">
+                                StockFlow
+                            </h2>
+
+                            <p className="text-gray-500">
+                                Sales Invoice
+                            </p>
+                        </div>
+
+                        <div className="text-right">
+                            <p className="font-semibold">
+                                Bill ID: {generatedBill._id.slice(-6)}
+                            </p>
+
+                            <p className="text-gray-500">
+                                Date:{" "}
+                                {new Date(
+                                    generatedBill.createdAt
+                                ).toLocaleDateString()}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Invoice Items */}
+                    <div className="overflow-x-auto">
+
+                        <table className="w-full">
+
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="text-left p-3">
+                                        Product
+                                    </th>
+
+                                    <th className="text-left p-3">
+                                        Price
+                                    </th>
+
+                                    <th className="text-left p-3">
+                                        Quantity
+                                    </th>
+
+                                    <th className="text-left p-3">
+                                        Total
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {generatedBill.items.map((item) => (
+                                    <tr
+                                       key={item.product}
+                                       className="border-t"
+                                    >
+                                        <td className="p-3">
+                                            {item.name}
+                                        </td>
+
+                                        <td className="p-3">
+                                            ₹{item.price}
+                                        </td>
+
+                                        <td className="p-3">
+                                            {item.quantity}
+                                        </td>
+
+                                        <td className="p-3 font-medium">
+                                            ₹{item.total}
+                                        </td>
+                                    </tr>
+                                ))}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    {/* Invoice Total */}
+                    <div className="flex justify-end mt-6">
+
+                        <div className="w-64">
+                            
+                            <div className="flex justify-between text-xl font-bold border-t pt-4">
+                                <span>Total</span>
+
+                                <span>
+                                    ₹{generatedBill.total}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    
+                </div>
+            )}
 
         </div>
     );
