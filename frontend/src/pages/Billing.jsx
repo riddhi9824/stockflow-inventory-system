@@ -303,7 +303,7 @@ function Billing() {
 
             {/* Generated Invoice */}
             {generatedBill && (
-                <div className="mt-8 bg-white rounded-xl shadow p-8">
+                <div className="invoice-section mt-8 bg-white rounded-xl shadow p-8">
 
                     <div className="flex justify-between items-start mb-8">
                         <div>
@@ -403,7 +403,16 @@ function Billing() {
                         </div>
 
                     </div>
-                    
+
+                    <div className="flex justify-end mt-6">
+                        <button
+                             onClick={() => window.print()}
+                             className="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700"
+                        >
+                            🖨️ Print Invoice
+                        </button>
+                    </div>
+
                 </div>
             )}
 
