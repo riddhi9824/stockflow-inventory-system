@@ -3,18 +3,24 @@
     body * {
         visibility: hidden;
     }
-    .invoice-section,
-    .invoice-section * {
+    .invoice-print,
+    .invoice-print * {
         visibility: visible;
     }
-    .invoice-section {
+    .invoice-print {
         position: absolute;
         left: 0;
         top: 0;
         width: 100%;
+        max-width: none;
         box-shadow: none;
     }
-    .invoice-section button {
+    .invoice-overlay {
+        position: static;
+        background: white;
+        padding: 0;
+    }
+    .invoice-print button {
         display: none;
     }
 }
