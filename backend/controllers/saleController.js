@@ -87,10 +87,37 @@ const getSales = async(req, res) => {
         const sales = await Sale.find()
             .sort({ createdAt: -1 });
 
+        const salesWithCostPrice = await Promise.all(
+            sales.map(async(sale) => {
+                const updatedItems = await Promise.all(
+                    sale.items.map(async(item) => {
+                        //New sales already have costPrice
+                        if (item.costPrice !== undefined) {
+                            return item;
+                        }
+
+                        //Older sales don't have costPrice
+                        const product = await Product.findById(item.product)
+                            .select("costPrice");
+
+                        return {
+                            ...item.toObject(),
+                            costPrice: product ? product.costPrice : 0,
+                        };
+                    })
+                );
+
+                return {
+                    ...sale.toObject(),
+                    items: updatedItems,
+                };
+            })
+        );
+
         res.status(200).json({
             success: true,
-            count: sales.length,
-            data: sales,
+            count: salesWithCostPrice.length,
+            data: salesWithCostPrice,
         });
 
     } catch (error) {

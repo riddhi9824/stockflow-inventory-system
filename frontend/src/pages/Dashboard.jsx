@@ -6,6 +6,7 @@ import { getProducts } from "../services/productService";
 function Dashboard() {
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [sales, setSales] = useState([]);
 
     const totalProducts = products.length;
 
@@ -23,6 +24,37 @@ function Dashboard() {
         0
     );
 
+    const totalRevenue = sales.reduce(
+        (total, sale) => total + sale.total,
+        0
+    );
+
+    const productsSold = sales.reduce(
+        (total, sale) =>
+            total + 
+            sale.items.reduce(
+                (itemTotal, item) => itemTotal + item.quantity,
+                0
+            ),
+        0
+    );
+
+    const totalProfit = sales.reduce(
+    (total, sale) =>
+        total +
+        sale.items.reduce(
+            (itemTotal, item) => {
+                console.log("Sale item:", item);
+                console.log("Cost Price:", item.costPrice);
+                
+                return itemTotal +
+                    ((item.price - item.costPrice) * item.quantity);
+            },
+            0
+        ),
+    0
+);
+
     const filteredProducts = products.filter((product) => 
        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -31,6 +63,7 @@ function Dashboard() {
 
     useEffect(() => {
         fetchProducts();
+        fetchSales();
     }, []);
 
     const fetchProducts = async () => {
@@ -39,6 +72,18 @@ function Dashboard() {
             setProducts(response.data.data);
         } catch (error){
             console.error("Error fetching products: ", error);
+        }
+    };
+
+    const fetchSales = async () => {
+        try {
+            const response = await axios.get(
+                "http://localhost:5001/api/sales"
+            );
+
+            setSales(response.data.data);
+        } catch (error) {
+            console.error("Error fetching sales:", error);
         }
     };
     const handleDelete = async (id) => {
@@ -143,6 +188,27 @@ function Dashboard() {
                         <p className="text-gray-500">Inventory Value</p>
                         <h3 className="text-3xl font-bold mt-2">
                             ₹{inventoryValue}
+                        </h3>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl shadow">
+                        <p className="text-gray-500">Total Revenue</p>
+                        <h3 className="text-3xl font-bold mt-2">
+                            ₹{totalRevenue}
+                        </h3>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl shadow">
+                        <p className="text-gray-500">Products Sold</p>
+                        <h3 className="text-3xl font-bold mt-2">
+                            {productsSold}
+                        </h3>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl shadow">
+                        <p className="text-gray-500">Total Profit</p>
+                        <h3 className="text-3xl font-bold mt-2">
+                            ₹{totalProfit}
                         </h3>
                     </div>
 
