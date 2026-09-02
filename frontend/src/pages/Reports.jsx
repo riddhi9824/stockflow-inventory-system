@@ -5,6 +5,18 @@ function Reports() {
     const [sales, setSales] = useState([]);
     const [selectedSale, setSelectedSale] = useState(null);
 
+    const today = new Date().toLocaleDateString();
+
+    const todaySales = sales.filter(
+        (sale) => 
+            new Date(sale.createdAt).toLocaleDateString() === today
+    );
+
+    const todayRevenue = todaySales.reduce(
+        (total, sale) => total + sale.total,
+        0
+    );
+
     const totalRevenue = sales.reduce(
         (total, sale) => total + sale.total,
         0
@@ -54,7 +66,7 @@ function Reports() {
             </div>
 
             {/* Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
 
                 <div className="bg-white rounded-xl shadow p-6">
                     <p className="text-gray-500">
@@ -73,6 +85,16 @@ function Reports() {
 
                     <h2 className="text-3xl font-bold mt-2">
                         ₹{totalRevenue}
+                    </h2>
+                </div>
+
+                <div className="bg-white rounded-xl shadow p-6">
+                    <p className="text-gray-500">
+                        Today's Revenue
+                    </p>
+
+                    <h2 className="text-3xl font-bold mt-2">
+                        ₹{todayRevenue}
                     </h2>
                 </div>
 

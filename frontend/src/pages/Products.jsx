@@ -134,6 +134,53 @@ function Products() {
         }
     };
 
+    //Restock product
+    const handleRestock = async (product)=> {
+        const quantity = window.prompt(
+            `Enter quantity to add for ${product.name}:`
+        );
+
+        if(quantity === null) return;
+
+        const restockQuantity = Number(quantity);
+
+        if(restockQuantity <= 0 || isNaN(restockQuantity)) {
+            alert("Please enter a valid quantity greater than 0.");
+            return;
+        }
+
+        try {
+            const response = await axios.put(
+                `http://localhost:5001/api/products/${product._id}`,
+                {
+                    stock: product.stock + restockQuantity,
+                }
+            );
+
+            console.log("RESTOCK RESPONSE:", response.data);
+
+            alert("Product restocked successfully!");
+
+            setProducts((prevProducts) =>
+               prevProducts.map((item) =>
+                   item._id === product._id
+                       ? {
+                           ...item,
+                           stock: product.stock + restockQuantity,
+                       }
+                       : item
+                )
+            );
+        } catch (error) {
+            console.error("Restock error:", error);
+
+            alert(
+                error.response?.data?.message ||
+                "Failed to restock product"
+            );
+        }
+    };
+
     // Reset form
     const resetForm = () => {
         setFormData({
@@ -378,7 +425,16 @@ function Products() {
                                             <td className="p-4">
                                                 <div className="flex gap-2">
 
-                                                    <button
+                                                    {isLowStock && (
+                                                        <button
+                                                            onClick={() => handleRestock(product)}
+                                                            className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700"
+                                                        >
+                                                            Restock
+                                                        </button>
+                                                    )}
+
+                                                    <button 
                                                         onClick={() =>
                                                             handleEdit(product)
                                                         }
@@ -387,8 +443,8 @@ function Products() {
                                                         Edit
                                                     </button>
 
-                                                    <button
-                                                        onClick={() =>
+                                                    <button 
+                                                        onClick={() => 
                                                             handleDelete(product._id)
                                                         }
                                                         className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700"
@@ -398,7 +454,6 @@ function Products() {
 
                                                 </div>
                                             </td>
-
                                         </tr>
                                     );
                                 })}
@@ -411,6 +466,52 @@ function Products() {
                 )}
 
             </div>
+
+            {/* Low Stock Alerts */}
+            {products.filter(
+                (product) => product.stock <= product.lowStockAlert
+            ).length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
+
+                    <h2 className="text-xl font-semibold text-red-700 mb-4">
+                        ⚠️ Low Stock Alerts
+                    </h2>
+
+                    <div className="space-y-3">
+                        {products
+                            .filter(
+                                (product) => 
+                                    product.stock <= product.lowStockAlert
+                            )
+                            .map((product) => (
+                                <div 
+                                    key={product._id}
+                                    className="flex justify-between items-center bg-white border border-red-100 rounded-lg p-4"
+                                >
+                                    <div>
+                                        <p className="font-semibold text-gray-800">
+                                            {product.name}
+                                        </p>
+
+                                        <p className="text-sm text-gray-500">
+                                            SKU: {product.sku}
+                                        </p>
+                                    </div>
+
+                                    <div className="text-right">
+                                        <p className="font-semibold text-red-600">
+                                            {product.stock} left
+                                        </p>
+
+                                        <p className="text-sm text-gray-500">
+                                            Alert at {product.lowStockAlert}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
+                </div>
+            )}
 
         </div>
     );

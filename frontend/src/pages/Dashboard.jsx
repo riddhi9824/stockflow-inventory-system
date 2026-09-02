@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { getProducts } from "../services/productService";
+import { getSales } from "../services/saleService";
 
 function Dashboard() {
     const [products, setProducts] = useState([]);
@@ -67,25 +68,31 @@ function Dashboard() {
     }, []);
 
     const fetchProducts = async () => {
-        try {
-            const response = await getProducts();
-            setProducts(response.data.data);
-        } catch (error){
-            console.error("Error fetching products: ", error);
-        }
-    };
+    try {
+        const response = await getProducts();
+
+        console.log("PRODUCT API RESPONSE:", response);
+        console.log("PRODUCT DATA:", response.data.data);
+
+        setProducts(response.data.data);
+    } catch (error) {
+        console.error("Error fetching products:", error);
+    }
+};
 
     const fetchSales = async () => {
         try {
-            const response = await axios.get(
-                "http://localhost:5001/api/sales"
-            );
+            const response = await getSales();
+
+            console.log("SALES API RESPONSE:", response);
+            console.log("SALES DATA:", response.data.data);
 
             setSales(response.data.data);
         } catch (error) {
             console.error("Error fetching sales:", error);
         }
     };
+    
     const handleDelete = async (id) => {
         const confirmDelete = window.confirm(
             "Are you sure you want to delete this product?"
