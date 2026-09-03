@@ -151,9 +151,9 @@ function Products() {
 
         try {
             const response = await axios.put(
-                `http://localhost:5001/api/products/${product._id}`,
+                `http://localhost:5001/api/products/${product._id}/restock`,
                 {
-                    stock: product.stock + restockQuantity,
+                    quantity: restockQuantity,
                 }
             );
 

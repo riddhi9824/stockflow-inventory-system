@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import Billing from "./pages/Billing";
 import Reports from "./pages/Reports";
+import StockHistory from "./pages/StockHistory";
 import NotFound from "./pages/NotFound";
 
 function App(){
@@ -15,6 +16,7 @@ function App(){
       <Route path="/products" element={<Products />} />
       <Route path="/billing" element={<Billing />} />
       <Route path="/reports" element={<Reports />} />
+      <Route path="/stock-history" element={<StockHistory />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -1,5 +1,6 @@
 const Sale = require("../models/Sale");
 const Product = require("../models/Product");
+const StockMovement = require("../models/StockMovement");
 
 // Create Sale
 const createSale = async(req, res) => {
@@ -48,15 +49,25 @@ const createSale = async(req, res) => {
             });
         }
 
-        // Reduce product stock
+        // Reduce product stock and record stock movement
         for (const item of items) {
-            await Product.findByIdAndUpdate(
-                item.product, {
-                    $inc: {
-                        stock: -item.quantity,
-                    },
-                }
-            );
+            const product = await Product.findById(item.product);
+
+            const previousStock = product.stock;
+            const newStock = previousStock - item.quantity;
+
+            product.stock = newStock;
+
+            await product.save();
+
+            await StockMovement.create({
+                product: product._id,
+                productName: product.name,
+                type: "SALE",
+                quantity: item.quantity,
+                previousStock,
+                newStock,
+            });
         }
 
         // Create sale

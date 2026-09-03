@@ -92,7 +92,7 @@ function Dashboard() {
             console.error("Error fetching sales:", error);
         }
     };
-    
+
     const handleDelete = async (id) => {
         const confirmDelete = window.confirm(
             "Are you sure you want to delete this product?"
@@ -146,6 +146,13 @@ function Dashboard() {
                         className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
                     >
                         Reports
+                    </Link>
+
+                    <Link
+                        to="/stock-history"
+                        className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
+                    >
+                        Stock History
                     </Link>
                 </nav>
             </aside>

@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const StockMovement = require("../models/StockMovement");
 
 //Create Product
 const createProduct = async(req, res) => {
@@ -65,6 +66,59 @@ const updateProduct = async(req, res) => {
     }
 };
 
+//Restock Product
+const restockProduct = async(req, res) => {
+    try {
+        const { quantity } = req.body;
+
+        if (!quantity || quantity <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Restock quantity must be greater than 0",
+            });
+        }
+
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found",
+            });
+        }
+
+        const previousStock = product.stock;
+        const newStock = previousStock + Number(quantity);
+
+        product.stock = newStock;
+
+        await product.save();
+
+        await StockMovement.create({
+            product: product._id,
+            productName: product.name,
+            type: "RESTOCK",
+            quantity: Number(quantity),
+            previousStock,
+            newStock,
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Product restocked successfully",
+            data: product,
+        });
+
+    } catch (error) {
+        console.error("Restock error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 //Delete Product
 const deleteProduct = async(req, res) => {
     try {
@@ -93,5 +147,6 @@ module.exports = {
     createProduct,
     getProducts,
     updateProduct,
+    restockProduct,
     deleteProduct,
 };

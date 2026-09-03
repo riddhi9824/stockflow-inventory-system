@@ -1,5 +1,6 @@
 const productRoutes = require("./routes/productRoutes");
 const saleRoutes = require("./routes/saleRoutes");
+const stockMovementRoutes = require("./routes/stockMovementRoutes");
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -16,6 +17,7 @@ app.use(express.json());
 
 app.use("/api/products", productRoutes);
 app.use("/api/sales", saleRoutes);
+app.use("/api/stock-movements", stockMovementRoutes);
 
 //Test Route
 app.get("/", (req, res) => {
