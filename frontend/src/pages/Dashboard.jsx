@@ -135,6 +135,13 @@ function Dashboard() {
                       </Link>
 
                     <Link
+                       to="/suppliers"
+                       className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
+                    >
+                        Suppliers
+                    </Link>
+
+                    <Link
                        to="/billing"
                        className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
                     >
