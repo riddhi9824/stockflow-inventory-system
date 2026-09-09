@@ -6,12 +6,14 @@ function Products() {
     const [searchTerm, setSearchTerm] = useState("");
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    const [suppliers, setSuppliers] = useState([]);
 
     const [formData, setFormData] = useState({
         name: "",
         sku: "",
         barcode: "",
         category: "",
+        supplier: "",
         costPrice: "",
         sellingPrice: "",
         stock: "",
@@ -31,8 +33,22 @@ function Products() {
         }
     };
 
+    //Fetch suppliers
+    const fetchSuppliers = async () => {
+        try {
+            const response = await axios.get(
+                "http://localhost:5001/api/suppliers"
+            );
+
+            setSuppliers(response.data.data);
+        } catch (error) {
+            console.error("Error fetching suppliers:", error);
+        }
+    };
+
     useEffect(() => {
         fetchProducts();
+        fetchSuppliers();
     }, []);
     
     const filteredProducts = products.filter((product) => 
@@ -102,6 +118,7 @@ function Products() {
             sku: product.sku,
             barcode: product.barcode || "",
             category: product.category,
+            supplier: product.supplier?._id || product.supplier || "",
             costPrice: product.costPrice,
             sellingPrice: product.sellingPrice,
             stock: product.stock,
@@ -188,6 +205,7 @@ function Products() {
             sku: "",
             barcode: "",
             category: "",
+            supplier: "",
             costPrice: "",
             sellingPrice: "",
             stock: "",
@@ -276,6 +294,21 @@ function Products() {
                             className="border p-3 rounded-lg"
                         />
 
+                        <select 
+                            name="supplier"
+                            value={formData.supplier}
+                            onChange={handleChange}
+                            className="border p-3 rounded-lg"
+                        >
+                            <option value="">Select Supplier</option>
+
+                            {suppliers.map((supplier) => (
+                                <option key={supplier._id} value={supplier._id}>
+                                    {supplier.name}
+                                </option>
+                            ))}
+                        </select>
+
                         <input
                             type="number"
                             name="costPrice"
@@ -363,6 +396,7 @@ function Products() {
                                     <th className="text-left p-4">Product</th>
                                     <th className="text-left p-4">SKU</th>
                                     <th className="text-left p-4">Category</th>
+                                    <th className="text-left p-4">Supplier</th>
                                     <th className="text-left p-4">Cost Price</th>
                                     <th className="text-left p-4">Selling Price</th>
                                     <th className="text-left p-4">Stock</th>
@@ -394,6 +428,10 @@ function Products() {
 
                                             <td className="p-4">
                                                 {product.category}
+                                            </td>
+
+                                            <td className="p-4">
+                                                {product.supplier?.name || "Not Assigned"}
                                             </td>
 
                                             <td className="p-4">
