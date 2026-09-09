@@ -7,6 +7,11 @@ const stockMovementSchema = new mongoose.Schema({
         required: true,
     },
 
+    supplier: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Supplier",
+    },
+
     productName: {
         type: String,
         required: true,

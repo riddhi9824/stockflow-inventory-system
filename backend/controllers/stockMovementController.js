@@ -4,6 +4,7 @@ const StockMovement = require("../models/StockMovement");
 const getStockMovements = async(req, res) => {
     try {
         const movements = await StockMovement.find()
+            .populate("supplier", "name phone email")
             .sort({ createdAt: -1 });
 
         res.status(200).json({

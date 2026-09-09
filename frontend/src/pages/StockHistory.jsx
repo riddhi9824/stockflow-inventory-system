@@ -47,6 +47,9 @@ function StockHistory() {
                                 <th className="text-left px-6 py-4">
                                     Product
                                 </th>
+                                <th className="text-left px=6 py-4">
+                                    Supplier
+                                </th>
                                 <th className="text-left px-6 py-4">
                                     Type
                                 </th>
@@ -73,6 +76,10 @@ function StockHistory() {
                                 >
                                     <td className="px-6 py-4 font-medium text-gray-800">
                                         {movement.productName}
+                                    </td>
+
+                                    <td className="px-6 py-4">
+                                        {movement.supplier?.name || "Not Assigned"}
                                     </td>
 
                                     <td className="px-6 py-4">

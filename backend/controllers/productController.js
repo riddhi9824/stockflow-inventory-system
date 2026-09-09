@@ -98,6 +98,7 @@ const restockProduct = async(req, res) => {
 
         await StockMovement.create({
             product: product._id,
+            supplier: product.supplier,
             productName: product.name,
             type: "RESTOCK",
             quantity: Number(quantity),
