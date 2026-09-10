@@ -7,7 +7,7 @@ import Billing from "./pages/Billing";
 import Reports from "./pages/Reports";
 import StockHistory from "./pages/StockHistory";
 import Suppliers from "./pages/Suppliers";
-import supplierPerformance from "./pages/SupplierPerformance";
+import SupplierPerformance from "./pages/SupplierPerformance";
 import NotFound from "./pages/NotFound";
 
 function App(){

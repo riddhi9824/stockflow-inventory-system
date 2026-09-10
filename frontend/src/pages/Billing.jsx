@@ -37,13 +37,17 @@ function Billing() {
         );
 
         if (existingProduct) {
-            setCart(
-                cart.map((item) =>
-                    item._id === product._id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                )
-            );
+            if (existingProduct.quantity < product.stock) {
+                setCart(
+                    cart.map((item) => 
+                        item._id === product._id
+                            ? { ...item, quantity: item.quantity + 1 }
+                            : item
+                    )
+                );
+            } else {
+                alert("Cannot add more than available stock.");
+            }
         } else {
             setCart([
                 ...cart,
