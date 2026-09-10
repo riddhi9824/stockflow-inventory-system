@@ -5,6 +5,7 @@ const {
     getSuppliers,
     updateSupplier,
     deleteSupplier,
+    getSupplierPerformance,
 } = require("../controllers/supplierController");
 
 const router = express.Router();
@@ -14,6 +15,7 @@ router
     .post(createSupplier)
     .get(getSuppliers);
 
+router.get("/performance", getSupplierPerformance);
 router
     .route("/:id")
     .put(updateSupplier)

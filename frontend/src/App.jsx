@@ -7,6 +7,7 @@ import Billing from "./pages/Billing";
 import Reports from "./pages/Reports";
 import StockHistory from "./pages/StockHistory";
 import Suppliers from "./pages/Suppliers";
+import supplierPerformance from "./pages/SupplierPerformance";
 import NotFound from "./pages/NotFound";
 
 function App(){
@@ -16,6 +17,10 @@ function App(){
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/products" element={<Products />} />
       <Route path="/suppliers" element={<Suppliers />} />
+      <Route 
+          path="/supplier-performance"
+          element={<SupplierPerformance />}
+      />
       <Route path="/billing" element={<Billing />} />
       <Route path="/reports" element={<Reports />} />
       <Route path="/stock-history" element={<StockHistory />} />

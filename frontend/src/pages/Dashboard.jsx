@@ -141,6 +141,13 @@ function Dashboard() {
                         Suppliers
                     </Link>
 
+                    <Link 
+                        to="/supplier-performance"
+                        className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
+                    >
+                        Supplier Performance
+                    </Link>
+
                     <Link
                        to="/billing"
                        className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"

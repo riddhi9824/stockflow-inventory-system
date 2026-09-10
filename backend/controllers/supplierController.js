@@ -1,4 +1,6 @@
 const Supplier = require("../models/Supplier");
+const Product = require("../models/Product");
+const StockMovement = require("../models/StockMovement");
 
 //Create Supplier
 const createSupplier = async(req, res) => {
@@ -114,9 +116,55 @@ const deleteSupplier = async(req, res) => {
     }
 };
 
+//Get supplier performance
+const getSupplierPerformance = async(req, res) => {
+    try {
+        const suppliers = await Supplier.find().sort({ createdAt: -1 });
+
+        const performance = await Promise.all(
+            suppliers.map(async(supplier) => {
+                const products = await Product.find({
+                    supplier: supplier._id,
+                });
+
+                const restocks = await StockMovement.find({
+                    supplier: supplier._id,
+                    type: "RESTOCK",
+                });
+
+                const totalQuantityRestocked = restocks.reduce(
+                    (total, movement) => total + movement.quantity,
+                    0
+                );
+
+                return {
+                    supplier,
+                    productCount: products.length,
+                    restockCount: restocks.length,
+                    totalQuantityRestocked,
+                };
+            })
+        );
+
+        res.status(200).json({
+            success: true,
+            count: performance.length,
+            data: performance,
+        });
+    } catch (error) {
+        console.error("Get supplier performance error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createSupplier,
     getSuppliers,
     updateSupplier,
     deleteSupplier,
+    getSupplierPerformance,
 };
