@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function Billing() {
     const [products, setProducts] = useState([]);
@@ -112,6 +114,57 @@ function Billing() {
             total + item.sellingPrice * item.quantity,
         0
     );
+
+    const downloadPDF = () => {
+        if (!generatedBill) {
+            alert("Generate a bill first.");
+            return;
+        }
+
+        const doc = new jsPDF();
+
+        doc.setFontSize(20);
+        doc.text("StockFlow", 14, 20);
+
+        doc.setFontSize(14);
+        doc.text("Sales Invoice", 14, 30);
+
+        doc.setFontSize(10);
+        doc.text(`Bill Id: ${generatedBill._id}`, 14, 40);
+        doc.text(
+            `Date: ${new Date(generatedBill.createdAt).toLocaleDateString()}`,
+            14,
+            47
+        );
+
+        doc.text(
+            `Customer: ${generatedBill.customerName || "Walk-in Customer"}`,
+            14,
+            54
+        );
+
+        if(generatedBill.customerPhone) {
+            doc.text(`Phone: ${generatedBill.customerPhone}`, 14, 61);
+        }
+
+        autoTable(doc, {
+            startY: 70,
+            head: [["Product", "Price", "Quantity", "Total"]],
+            body: generatedBill.items.map((item) => [
+                item.name,
+                `Rs. ${item.price}`,
+                item.quantity,
+                `Rs. ${item.total}`,
+            ]),
+        });
+
+        const finalY = doc.lastAutoTable.finalY || 70;
+
+        doc.setFontSize(14);
+        doc.text(`Total: Rs. ${generatedBill.total}`, 14, finalY + 15);
+
+        doc.save(`StockFlow-Invoice-${generatedBill._id}.pdf`);
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 p-8">
@@ -450,12 +503,19 @@ function Billing() {
 
                     </div>
 
-                    <div className="flex justify-end mt-6">
+                    <div className="flex justify-end gap-3 mt-6">
                         <button
                              onClick={() => window.print()}
                              className="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700"
                         >
                             🖨️ Print Invoice
+                        </button>
+
+                        <button 
+                            onClick={downloadPDF}
+                            className="bg-green-600 text-white px-5 py-3 rounded-lg hover:bg-green-700"
+                        >
+                            📄 Download PDF
                         </button>
                     </div>
 
