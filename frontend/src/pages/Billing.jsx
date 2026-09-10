@@ -7,6 +7,9 @@ function Billing() {
     const [cart, setCart] = useState([]);
     const [generatedBill, setGeneratedBill] = useState(null);
 
+    const [customerName, setCustomerName] = useState("");
+    const [customerPhone, setCustomerPhone] = useState("");
+
     // Fetch products
     const fetchProducts = async () => {
         try {
@@ -73,6 +76,8 @@ function Billing() {
 
         try {
             const saleData = {
+                customerName: customerName.trim() || "Walk-in Customer",
+                customerPhone: customerPhone.trim(),
                 items: cart.map((item) => ({
                     product: item._id,
                     quantity: item.quantity,
@@ -123,6 +128,31 @@ function Billing() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                {/* Customer Details */}
+                <div className="lg:col-span-2 bg-white rounded-xl shadow p-6">
+                    <h2 className="text-xl font-semibold mb-5">
+                        Customer Details
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input
+                            type="text"
+                            placeholder="Customer Name"
+                            value={customerName}
+                            onChange={(e) => setCustomerName(e.target.value)}
+                            className="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none"
+                        />
+
+                        <input
+                            type="tel"
+                            placeholder="Customer Name"
+                            value={customerPhone}
+                            onChange={(e) => setCustomerPhone(e.target.value)}
+                            className="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none"
+                        /> 
+                    </div>
+                </div>
 
                 {/* Products Section */}
                 <div className="bg-white rounded-xl shadow p-6">
@@ -318,6 +348,18 @@ function Billing() {
                             <p className="text-gray-500">
                                 Sales Invoice
                             </p>
+
+                            <div className="mt-4">
+                                <p className="font-semibold">
+                                    Customer: {generatedBill.customerName || "Walk-in Customer"}
+                                </p>
+
+                                {generatedBill.customerPhone && (
+                                    <p className="text-gray-500">
+                                        Phone: {generatedBill.customerPhone}
+                                    </p>
+                                )}
+                            </div>
                         </div>
 
                         <div className="text-right">

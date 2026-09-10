@@ -5,7 +5,7 @@ const StockMovement = require("../models/StockMovement");
 // Create Sale
 const createSale = async(req, res) => {
     try {
-        const { items } = req.body;
+        const { items, customerName, customerPhone } = req.body;
 
         if (!items || items.length === 0) {
             return res.status(400).json({
@@ -72,6 +72,8 @@ const createSale = async(req, res) => {
 
         // Create sale
         const sale = await Sale.create({
+            customerName,
+            customerPhone,
             items: saleItems,
             subtotal,
             total: subtotal,

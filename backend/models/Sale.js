@@ -38,6 +38,17 @@ const saleItemSchema = new mongoose.Schema({
 }, { _id: false });
 
 const saleSchema = new mongoose.Schema({
+    customerName: {
+        type: String,
+        trim: true,
+        default: "Walk-in Customer",
+    },
+    customerPhone: {
+        type: String,
+        trim: true,
+        default: "",
+    },
+
     items: {
         type: [saleItemSchema],
         required: true,
