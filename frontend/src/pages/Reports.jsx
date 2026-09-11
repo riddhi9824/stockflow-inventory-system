@@ -8,6 +8,8 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
+    BarChart,
+    Bar,
 } from "recharts";
 
 function Reports() {
@@ -62,6 +64,25 @@ function Reports() {
     }, []).sort(
         (a, b) => new Date(a.date) - new Date(b.date)
     );
+
+    const productSalesData = sales.reduce((data, sale) => {
+        sale.items.forEach((item) => {
+            const existingProduct = data.find(
+                (product) => product.name === item.name
+            );
+
+            if(existingProduct) {
+                existingProduct.quantity += item.quantity;
+            } else {
+                data.push({
+                    name: item.name,
+                    quantity: item.quantity,
+                });
+            }
+        });
+
+        return data;
+    }, []);
 
     const fetchSales = async () => {
         try {
@@ -178,6 +199,30 @@ function Reports() {
                                 strokeWidth={3}
                             />
                         </LineChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow p-6 mt-6">
+                <h2 className="text-xl font-semibold mb-4">
+                    Sales by Product
+                </h2>
+
+                <div className="w-full h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={productSalesData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip
+                                formatter={(value) => [value, "Units Sold"]}
+                            />
+                            <Bar
+                                dataKey="quantity"
+                                fill="#16a34a"
+                                name="Units Sold"
+                            />
+                        </BarChart>
                     </ResponsiveContainer>
                 </div>
             </div>
