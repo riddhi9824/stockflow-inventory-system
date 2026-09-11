@@ -11,6 +11,30 @@ function Dashboard() {
     const [restockProductId, setRestockProductId] = useState(null);
     const [restockQuantity, setRestockQuantity] = useState("");
 
+    const today = new Date().toLocaleDateString();
+
+    const todaySales = sales.filter(
+        (sale) => 
+            new Date(sale.createdAt).toLocaleDateString() === today
+    );
+
+    const todayRevenue = todaySales.reduce(
+        (total, sale) => total + sale.total,
+        0
+    );
+
+    const todayProfit = todaySales.reduce(
+        (total, sale) =>
+            total +
+            sale.items.reduce(
+                (itemTotal, item) => 
+                    itemTotal + 
+                    ((item.price - item.costPrice) * item.quantity),
+                0
+            ),
+        0
+    );
+
     const totalProducts = products.length;
 
     const totalStock = products.reduce(
@@ -278,6 +302,27 @@ function Dashboard() {
                         </h3>
                     </div>
 
+                    <div className="bg-white p-6 rounded-xl shadow">
+                        <p className="text-gray-500">Today's Sales</p>
+                        <h3 className="text-3xl font-bold mt-2">
+                            {todaySales.length}
+                        </h3>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl shadow">
+                        <p className="text-gray-500">Today's Revenue</p>
+                        <h3 className="text-3xl font-bold mt-2">
+                            ₹{todayRevenue}
+                        </h3>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl shadow">
+                        <p className="text-gray-500">Today's Profit</p>
+                        <h3 className="text-3xl font-bold mt-2">
+                            ₹{todayProfit}
+                        </h3>
+                    </div>
+
                 </div>
 
                 {/* Low Stock Alerts */}
@@ -443,7 +488,7 @@ function Dashboard() {
                         >
                             View Reports
                         </Link>
-                        
+
                     </div>
                 </div>
 
