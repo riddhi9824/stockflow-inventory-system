@@ -401,6 +401,52 @@ function Dashboard() {
                     )}
                 </div>
 
+                {/* Quick Actions */}
+                <div className="bg-white rounded-xl shadow p-6 mb-6">
+                    <h2 className="text-xl font-semibold mb-4">
+                        Quick Actions
+                    </h2>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+                        <Link
+                            to="/products"
+                            className="bg-blue-600 text-white text-center px-4 py-3 rounded-lg hover:bg-blue-700"
+                        >
+                            + Add Product
+                        </Link>
+
+                        <Link
+                            to="/billing"
+                            className="bg-green-600 text-white text-center px-4 py-3 rounded-lg hover:bg-green-700"
+                        >
+                            Create Bill
+                        </Link>
+
+                        <Link
+                            to="/suppliers"
+                            className="bg-purple-600 text-white text-center px-4 py-3 rounded-lg hover:bg-purple-700"
+                        >
+                            Manage Suppliers
+                        </Link>
+
+                        <Link
+                            to="/stock-history"
+                            className="bg-orange-500 text-white text-center px-4 py-3 rounded-lg hover:bg-orange-600"
+                        >
+                            Stock History
+                        </Link>
+
+                        <Link
+                            to="/reports"
+                            className="bg-slate-700 text-white text-center px-4 py-3 rounded-lg hover:bg-slate-800"
+                        >
+                            View Reports
+                        </Link>
+                        
+                    </div>
+                </div>
+
                 {/* Search */}
                 <div className="bg-white rounded-xl shadow p-4 mb-6">
                     <input
