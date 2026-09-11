@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts";
 
 function Reports() {
     const [sales, setSales] = useState([]);
@@ -34,6 +43,25 @@ function Reports() {
     );
 
     const totalProfit = totalRevenue - totalCost;
+
+    const salesTrendData = sales.reduce((data, sale) => {
+        const date = new Date(sale.createdAt).toLocaleDateString();
+
+        const existingDate = data.find((item) => item.date === date);
+
+        if(existingDate) {
+            existingDate.revenue += sale.total;
+        } else {
+            data.push({
+                date,
+                revenue: sale.total,
+            });
+        }
+
+        return data;
+    }, []).sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+    );
 
     const fetchSales = async () => {
         try {
@@ -127,6 +155,31 @@ function Reports() {
                     </h2>
                 </div>
 
+            </div>
+
+            <div className="bg-white rounded-xl shadow p-6 mt-6">
+                <h2 className="text-xl font-semibold mb-4">
+                    Revenue Trend
+                </h2>
+
+                <div className="w-full h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={salesTrendData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="date" />
+                            <YAxis />
+                            <Tooltip
+                                formatter={(value) => [`Rs. ${value}`, "Revenue"]}
+                            />
+                            <Line
+                                type="monotone"
+                                dataKey="revenue"
+                                stroke="#2563eb"
+                                strokeWidth={3}
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
             </div>
 
             {/* Sales Table */}
