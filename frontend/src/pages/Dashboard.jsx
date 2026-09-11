@@ -8,6 +8,8 @@ function Dashboard() {
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [sales, setSales] = useState([]);
+    const [restockProductId, setRestockProductId] = useState(null);
+    const [restockQuantity, setRestockQuantity] = useState("");
 
     const totalProducts = products.length;
 
@@ -111,6 +113,42 @@ function Dashboard() {
         } catch (error) {
             console.error("Delete error:", error);
             alert("Failed to delete product");
+        }
+    };
+
+    const handleRestock = async (id) => {
+        if (!restockQuantity || Number(restockQuantity) <= 0) {
+            alert("Please enter a valid restock quantity.");
+            return;
+        }
+
+        try {
+            const response = await axios.put(
+                `http://localhost:5001/api/products/${id}/restock`,
+                {
+                    quantity: Number(restockQuantity),
+                }
+            );
+
+            setProducts((prevProducts) =>
+                prevProducts.map((product) =>
+                    product._id === id
+                        ? response.data.data
+                        : product
+                )
+            );
+
+            setRestockProductId(null);
+            setRestockQuantity("");
+
+            alert("Product restocked successfully.");
+        } catch (error) {
+            console.error("Restock error:", error);
+
+            alert(
+                error.response?.data?.message ||
+                "Failed to restock product."
+            );
         }
     };
     return(
@@ -310,9 +348,50 @@ function Dashboard() {
                                                 </td>
 
                                                 <td className="p-3">
-                                                    <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 tex-red-700">
-                                                        Low Stock
-                                                    </span>
+                                                    {restockProductId === product._id ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                type="number"
+                                                                min="1"
+                                                                placeholder="Qty"
+                                                                value={restockQuantity}
+                                                                onChange={(e) =>
+                                                                    setRestockQuantity(e.target.value)
+                                                                }
+                                                                className="w-20 border rounded px-2 py-1"
+                                                            />
+
+                                                            <button
+                                                                onClick={() => handleRestock(product._id)}
+                                                                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                                                            >
+                                                                Add
+                                                            </button>
+
+                                                            <button
+                                                                onClick={() => {
+                                                                    setRestockProductId(null);
+                                                                    setRestockQuantity("");
+                                                                }}
+                                                                className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
+                                                                Low Stock
+                                                            </span>
+
+                                                            <button 
+                                                                onClick={() => setRestockProductId(product._id)}
+                                                                className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                            >
+                                                                Restock
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
