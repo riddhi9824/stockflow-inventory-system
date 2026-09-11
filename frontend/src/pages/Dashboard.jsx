@@ -242,6 +242,86 @@ function Dashboard() {
 
                 </div>
 
+                {/* Low Stock Alerts */}
+                <div className="bg-white rounded-xl shadow p-6 mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold">
+                            Low Stock Alerts
+                        </h2>
+
+                        <Link
+                            to="/products"
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                            Manage Products →
+                        </Link>
+                    </div>
+
+                    {products.filter(
+                        (product) => product.stock <= product.lowStockAlert
+                    ).length === 0 ? (
+                        <p className="text-gray-500">
+                            All products have sufficient stock.
+                        </p>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="text-left p-3">
+                                            Product
+                                        </th>
+
+                                        <th className="text-left p-3">
+                                            Current Stock
+                                        </th>
+
+                                        <th className="text-left p-3">
+                                            Alert Level
+                                        </th>
+
+                                        <th className="text-left p-3">
+                                            Status
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {products
+                                        .filter(
+                                            (product) =>
+                                                product.stock <= product.lowStockAlert
+                                        )
+                                        .map((product) => (
+                                            <tr
+                                                key={product._id}
+                                                className="border-t"
+                                            >
+                                                <td className="p-3 font-medium">
+                                                    {product.name}
+                                                </td>
+
+                                                <td className="p-3 text-red-600 font-semibold">
+                                                    {product.stock}
+                                                </td>
+
+                                                <td className="p-3">
+                                                    {product.lowStockAlert}
+                                                </td>
+
+                                                <td className="p-3">
+                                                    <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 tex-red-700">
+                                                        Low Stock
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+
                 {/* Search */}
                 <div className="bg-white rounded-xl shadow p-4 mb-6">
                     <input

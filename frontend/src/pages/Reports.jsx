@@ -14,6 +14,7 @@ import {
 
 function Reports() {
     const [sales, setSales] = useState([]);
+    const [products, setProducts] = useState([]);
     const [selectedSale, setSelectedSale] = useState(null);
 
     const today = new Date().toLocaleDateString();
@@ -105,6 +106,10 @@ function Reports() {
         return data;
     }, []);
 
+    const lowStockProducts = products.filter(
+        (product) => product.stock <= product.lowStockAlert
+    );
+
     const fetchSales = async () => {
         try {
             const response = await axios.get(
@@ -117,8 +122,21 @@ function Reports() {
         }
     };
 
+    const fetchProducts = async () => {
+        try {
+            const response = await axios.get(
+                "http://localhost:5001/api/products"
+            );
+
+            setProducts(response.data.data);
+        } catch (error) {
+            console.error("Error fetching products:", error);
+        }
+    };
+
     useEffect(() => {
         fetchSales();
+        fetchProducts();
     }, []);
 
     return (
@@ -270,6 +288,66 @@ function Reports() {
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow p-6 mt-6">
+                <h2 className="text-xl font-semibold mb-4">
+                    Low Stock Products
+                </h2>
+
+                {lowStockProducts.length === 0 ? (
+                    <p className="text-gray-500">
+                        All products have sufficient stock.
+                    </p>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="text-left p-3">
+                                        Product
+                                    </th>
+                                    <th className="text-left p-3">
+                                        Stock
+                                    </th>
+                                    <th className="text-left p-3">
+                                        Alert Level
+                                    </th>
+                                    <th className="text-left p-3">
+                                        Status
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {lowStockProducts.map((product) => (
+                                    <tr 
+                                        key={product._id}
+                                        className="border-t"
+                                    >
+                                        <td className="p-3 font-medium">
+                                            {product.name}
+                                        </td>
+
+                                        <td className="p-3">
+                                            {product.stock}
+                                        </td>
+
+                                        <td className="p-3">
+                                            {product.lowStockAlert}
+                                        </td>
+
+                                        <td className="p-3">
+                                            <span className="text-red-600 font-semibold">
+                                                Low Stock
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
 
             {/* Sales Table */}
