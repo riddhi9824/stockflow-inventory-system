@@ -84,6 +84,27 @@ function Reports() {
         return data;
     }, []);
 
+    const productProfitData = sales.reduce((data, sale) => {
+        sale.items.forEach((item) => {
+            const existingProduct = data.find(
+                (product) => product.name === item.name
+            );
+
+            const profit = (item.price - item.costPrice) * item.quantity;
+
+            if(existingProduct) {
+                existingProduct.profit += profit;
+            } else {
+                data.push({
+                    name: item.name,
+                    profit,
+                });
+            }
+        });
+
+        return data;
+    }, []);
+
     const fetchSales = async () => {
         try {
             const response = await axios.get(
@@ -221,6 +242,30 @@ function Reports() {
                                 dataKey="quantity"
                                 fill="#16a34a"
                                 name="Units Sold"
+                            />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow p-6 mt-6">
+                <h2 className="text-xl font-semibold mb-4">
+                    Profit by Product
+                </h2>
+
+                <div className="w-full h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={productProfitData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip
+                                formatter={(value) => [`Rs. ${value}`, "Profit"]}
+                            />
+                            <Bar 
+                                dataKey="profit"
+                                fill="#16a34a"
+                                name="Profit"
                             />
                         </BarChart>
                     </ResponsiveContainer>
