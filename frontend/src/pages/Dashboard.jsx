@@ -116,6 +116,28 @@ const revenueTrendData = sales
             new Date(a.date) - new Date(b.date)
     );
 
+const topSellingProducts =sales
+    .reduce((data, sale) => {
+        sale.items.forEach((item) => {
+            const existingProduct = data.find(
+                (product) => product.name === item.name
+            );
+
+            if(existingProduct) {
+                existingProduct.quantity += item.quantity;
+            } else {
+                data.push({
+                    name: item.name,
+                    quantity: item.quantity,
+                });
+            }
+        });
+
+        return data;
+    }, [])
+    .sort((a, b) => b.quantity - a.quantity)
+    .slice(0, 5);
+
 const filteredProducts = products.filter((product) => 
        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -387,6 +409,52 @@ const fetchProducts = async () => {
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
+                </div>
+
+                {/* Top-Selling Products */}
+                <div className="bg-white rounded-xl shadow p-6 mb-6">
+                    <h2 className="text-xl font-semibold mb-4">
+                        Top-Selling Products
+                    </h2>
+
+                    {topSellingProducts.length === 0 ? (
+                        <p className="text-gray-500">
+                            No sales data available.
+                        </p>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="text-left p-3">
+                                            Product
+                                        </th>
+
+                                        <th className="text-left p-3">
+                                            Units Sold
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {topSellingProducts.map((product, index) => (
+                                        <tr 
+                                            key={product.name}
+                                            className="border-t"
+                                        >
+                                            <td className="p-3 font-medium">
+                                                {index + 1}. {product.name}
+                                            </td>
+
+                                            <td className="p-3 font-semibold">
+                                                {product.quantity}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
 
                 {/* Low Stock Alerts */}
