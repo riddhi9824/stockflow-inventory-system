@@ -138,6 +138,27 @@ const topSellingProducts =sales
     .sort((a, b) => b.quantity - a.quantity)
     .slice(0, 5);
 
+const salesByCategory = sales
+    .reduce((data, sale) => {
+        sale.items.forEach((item) => {
+            const existingCategory = data.find(
+                (category) => category.name === item.category
+            );
+
+            if(existingCategory) {
+                existingCategory.quantity += item.quantity;
+            } else {
+                data.push({
+                    name: item.category || "Uncategorized",
+                    quantity: item.quantity,
+                });
+            }
+        });
+
+        return data;
+    }, [])
+    .sort((a, b) => b.quantity - a.quantity);
+
 const filteredProducts = products.filter((product) => 
        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -448,6 +469,47 @@ const fetchProducts = async () => {
 
                                             <td className="p-3 font-semibold">
                                                 {product.quantity}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+
+                {/* Sales by Category */}
+                <div className="bg-white rounded-xl shadow p-6 mb-6">
+                    <h2 className="text-xl font-semibold mb-4">
+                        Sales by Category
+                    </h2>
+
+                    {salesByCategory.length === 0 ? (
+                        <p className="text-gray-500">
+                            No sales data available.
+                        </p>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="text-left p-3">Category</th>
+                                        <th className="text-left p-3">Units Sold</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {salesByCategory.map((category, index) => (
+                                        <tr
+                                            key={category.name}
+                                            className="border-t"
+                                        >
+                                            <td className="p-3 font-medium">
+                                                {index + 1}. {category.name}
+                                            </td>
+
+                                            <td className="p-3 font-semibold">
+                                                {category.quantity}
                                             </td>
                                         </tr>
                                     ))}
