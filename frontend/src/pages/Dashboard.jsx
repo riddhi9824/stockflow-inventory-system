@@ -503,6 +503,90 @@ function Dashboard() {
                     />
                 </div>
 
+                {/* Recent Sales*/}
+                <div className="bg-white rounded-xl shadow p-6 mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold">
+                            Recent Sales
+                        </h2>
+
+                        <Link
+                            to="/reports"
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                            View Reports →
+                        </Link>
+                    </div>
+
+                    {sales.length === 0 ? (
+                        <p className="text-gray-500">
+                            No sales recorded yet.
+                        </p>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="text-left p-3">
+                                            Customer
+                                        </th>
+
+                                        <th className="text-left p-3">
+                                            Date
+                                        </th>
+
+                                        <th className="text-left p-3">
+                                            Items
+                                        </th>
+
+                                        <th className="text-left p-3">
+                                            Total
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {sales
+                                        .slice()
+                                        .sort(
+                                            (a, b) =>
+                                                new Date(b.createdAt) - new Date(a.createdAt)
+                                        )
+                                        .slice(0, 5)
+                                        .map((sale) => (
+                                            <tr
+                                                key={sale._id}
+                                                className="border-t"
+                                            >
+                                                <td className="p-3 font-medium">
+                                                    {sale.customerName || "Walk-in Customer"}
+                                                </td>
+
+                                                <td className="p-3">
+                                                    {new Date(
+                                                        sale.createdAt
+                                                    ).toLocaleDateString()}
+                                                </td>
+
+                                                <td className="p-3">
+                                                    {sale.items.reduce(
+                                                        (total, item) =>
+                                                            total + item.quantity,
+                                                        0
+                                                    )}
+                                                </td>
+
+                                                <td className="p-3 font-semibold">
+                                                    ₹{sale.total}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+
                 {/* Product Table */}
                 <div className="bg-white rounded-xl shadow overflow-hidden">
                     <table className="w-full">
