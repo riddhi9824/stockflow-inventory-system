@@ -4,6 +4,16 @@ import { useEffect, useState } from "react";
 import { getProducts } from "../services/productService";
 import { getSales } from "../services/saleService";
 
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts";
+
 function Dashboard() {
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -82,18 +92,42 @@ function Dashboard() {
     0
 );
 
-    const filteredProducts = products.filter((product) => 
+const revenueTrendData = sales
+    .reduce((data, sale) => {
+        const date = new Date(sale.createdAt).toLocaleDateString();
+
+        const existingDate = data.find(
+            (item) => item.date === date
+        );
+
+        if(existingDate) {
+            existingDate.revenue += sale.total;
+        } else {
+            data.push({
+                date,
+                revenue: sale.total,
+            });
+        }
+
+        return data;
+    }, [])
+    .sort(
+        (a, b) =>
+            new Date(a.date) - new Date(b.date)
+    );
+
+const filteredProducts = products.filter((product) => 
        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
        product.category.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    useEffect(() => {
+useEffect(() => {
         fetchProducts();
         fetchSales();
-    }, []);
+}, []);
 
-    const fetchProducts = async () => {
+const fetchProducts = async () => {
     try {
         const response = await getProducts();
 
@@ -323,6 +357,36 @@ function Dashboard() {
                         </h3>
                     </div>
 
+                </div>
+
+                {/* Sales Revenue Trend */}
+                <div className="bg-white rounded-xl shadow p-6 mb-6">
+                    <h2 className="text-xl font-semibold mb-4">
+                        Sales Revenue Trend
+                    </h2>
+
+                    <div className="w-full h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={revenueTrendData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+
+                                <XAxis dataKey="date" />
+
+                                <YAxis />
+
+                                <Tooltip
+                                    formatter={(value) => [`₹${value}`, "Revenue"]}
+                                />
+
+                                <Line 
+                                    type="monotone"
+                                    dataKey="revenue"
+                                    stroke="#2563eb"
+                                    strokeWidth={3}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
 
                 {/* Low Stock Alerts */}
