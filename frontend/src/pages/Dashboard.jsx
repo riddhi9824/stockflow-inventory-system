@@ -159,6 +159,29 @@ const salesByCategory = sales
     }, [])
     .sort((a, b) => b.quantity - a.quantity);
 
+const totalOrders = sales.length;
+
+const averageOrderValue =
+    totalOrders > 0
+        ? sales.reduce((total, sale) => total + sale.total, 0) /
+          totalOrders
+        : 0;
+
+const totalItemsSold = sales.reduce(
+    (total, sale) =>
+        total +
+        sale.items.reduce(
+            (itemTotal, item) => itemTotal + item.quantity,
+            0
+        ),
+    0
+);
+
+const averageItemsPerOrder = 
+    totalOrders > 0
+        ? totalItemsSold / totalOrders
+        : 0;
+
 const filteredProducts = products.filter((product) => 
        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -400,6 +423,45 @@ const fetchProducts = async () => {
                         </h3>
                     </div>
 
+                </div>
+
+                {/* Sales Performance Summary */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-white rounded-xl shadow p-5">
+                        <h3 className="text-gray-500 text-sm font-medium">
+                            Total Orders
+                        </h3>
+                        <p className="text-2xl font-bold mt-2">
+                            {totalOrders}
+                        </p>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow p-5">
+                        <h3 className="text-gray-500 text-sm font-medium">
+                            Average Order Value
+                        </h3>
+                        <p className="text-2xl font-bold mt-2">
+                            ₹{averageOrderValue.toFixed(2)}
+                        </p>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow p-5">
+                        <h3 className="text-gray-500 text-sm font-medium">
+                            Total Items Sold
+                        </h3>
+                        <p className="text-2xl font-bold mt-2">
+                            {totalItemsSold}
+                        </p>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow p-5">
+                        <h3 className="text-gray-500 text-sm font-medium">
+                            Avg. Items per Order
+                        </h3>
+                        <p className="text-2xl font-bold mt-2">
+                            {averageItemsPerOrder.toFixed(1)}
+                        </p>
+                    </div>
                 </div>
 
                 {/* Sales Revenue Trend */}
