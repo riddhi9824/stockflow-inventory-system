@@ -182,6 +182,32 @@ const averageItemsPerOrder =
         ? totalItemsSold / totalOrders
         : 0;
 
+const salesByDay = sales.reduce((data, sale) => {
+    const date = new Date(sale.createdAt).toLocaleDateString();
+
+    const existingDay = data.find(
+        (day) => day.date === date
+    );
+
+    if(existingDay) {
+        existingDay.revenue += sale.total;
+    } else {
+        data.push({
+            date,
+            revenue: sale.total,
+        });
+    }
+
+    return data;
+}, []);
+
+const bestSalesDay = 
+    salesByDay.length > 0
+        ? salesByDay.reduce((best, current) => 
+            current.revenue > best.revenue ? current : best
+        )
+        : null;
+
 const filteredProducts = products.filter((product) => 
        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -426,7 +452,7 @@ const fetchProducts = async () => {
                 </div>
 
                 {/* Sales Performance Summary */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
                     <div className="bg-white rounded-xl shadow p-5">
                         <h3 className="text-gray-500 text-sm font-medium">
                             Total Orders
@@ -461,6 +487,28 @@ const fetchProducts = async () => {
                         <p className="text-2xl font-bold mt-2">
                             {averageItemsPerOrder.toFixed(1)}
                         </p>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow p-5">
+                        <h3 className="text-gray-500 text-sm font-medium">
+                            Best Sales Day
+                        </h3>
+
+                        {bestSalesDay ? (
+                            <>
+                                <p className="text-xl font-bold mt-2">
+                                    {bestSalesDay.date}
+                                </p>
+
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Revenue: ₹{bestSalesDay.revenue.toFixed(2)}
+                                </p>
+                            </>
+                        ) : (
+                            <p className="text-gray-500 mt-2">
+                                No sales recorded yet.
+                            </p>
+                        )}
                     </div>
                 </div>
 
