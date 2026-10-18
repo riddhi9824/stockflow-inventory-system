@@ -17,7 +17,60 @@ function Reports() {
     const [products, setProducts] = useState([]);
     const [selectedSale, setSelectedSale] = useState(null);
 
+    const [dateFilter, setDateFilter] = useState("all");
+    const [startDate,setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+
     const today = new Date().toLocaleDateString();
+
+    const getDateRange = () => {
+        const now = new Date();
+        const todayDate = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+        );
+
+        if (dateFilter === "today") {
+            return { start: todayDate, end: todayDate };
+        }
+
+        if (dateFilter === "7days") {
+            const start = new Date(todayDate);
+            start.setDate(start.getDate() - 6);
+            return { start, end: todayDate };
+        }
+
+        if (dateFilter === "30days") {
+            const start = new Date(todayDate);
+            start.setDate(start.getDate() - 29);
+            return { start, end: todayDate };
+        }
+
+        if (dateFilter === "custom") {
+            return {
+                start: startDate
+                    ? new Date(`${startDate}T00:00:00`)
+                    : null,
+                end: endDate
+                    ? new Date(`${endDate}T23:59:59:999`)
+                    : null,
+            };
+        }
+
+        return { start: null, end: null };
+    };
+
+    const { start: rangeStart, end: rangeEnd } = getDateRange();
+
+    const filteredSales = sales.filter((sale) => {
+        const saleDate = new Date(sale.createdAt);
+
+        if (rangeStart && saleDate < rangeStart) return false;
+        if (rangeEnd && saleDate > rangeEnd) return false;
+
+        return true;
+    });
 
     const todaySales = sales.filter(
         (sale) => 
@@ -29,12 +82,12 @@ function Reports() {
         0
     );
 
-    const totalRevenue = sales.reduce(
+    const totalRevenue = filteredSales.reduce(
         (total, sale) => total + sale.total,
         0
     );
 
-    const totalCost = sales.reduce(
+    const totalCost = filteredSales.reduce(
         (total, sale) => 
             total + 
             sale.items.reduce(
@@ -47,7 +100,7 @@ function Reports() {
 
     const totalProfit = totalRevenue - totalCost;
 
-    const salesTrendData = sales.reduce((data, sale) => {
+    const salesTrendData = filteredSales.reduce((data, sale) => {
         const date = new Date(sale.createdAt).toLocaleDateString();
 
         const existingDate = data.find((item) => item.date === date);
@@ -66,7 +119,7 @@ function Reports() {
         (a, b) => new Date(a.date) - new Date(b.date)
     );
 
-    const productSalesData = sales.reduce((data, sale) => {
+    const productSalesData = filteredSales.reduce((data, sale) => {
         sale.items.forEach((item) => {
             const existingProduct = data.find(
                 (product) => product.name === item.name
@@ -85,7 +138,7 @@ function Reports() {
         return data;
     }, []);
 
-    const productProfitData = sales.reduce((data, sale) => {
+    const productProfitData = filteredSales.reduce((data, sale) => {
         sale.items.forEach((item) => {
             const existingProduct = data.find(
                 (product) => product.name === item.name
@@ -153,6 +206,62 @@ function Reports() {
                 </p>
             </div>
 
+            {/* Date Range Filter */}
+            <div className="bg-white rounded-xl shadow p-5 mb-6">
+                <div className="flex flex-col md:flex-row md:items-end gap-4">
+                    <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Filter Sales By
+                        </label>
+
+                        <select 
+                            value={dateFilter}
+                            onChange={(e) => setDateFilter(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus: outline-none focus:ring-2 focus: ring-blue-500"
+                        >
+                            <option value="all">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="7days">Last 7 Days</option>
+                            <option value="30days">Last 30 Days</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+
+                    {dateFilter === "custom" && (
+                        <>
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Start Date
+                                </label>
+
+                                <input 
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    max={endDate || undefined}
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    End Date
+                                </label>
+
+                                <input
+                                    type="date"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    min={startDate || undefined}
+                                    max={new Date().toLocaleDateString("en-CA")}
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+
             {/* Summary */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
 
@@ -162,7 +271,7 @@ function Reports() {
                     </p>
 
                     <h2 className="text-3xl font-bold mt-2">
-                        {sales.length}
+                        {filteredSales.length}
                     </h2>
                 </div>
 
@@ -192,7 +301,7 @@ function Reports() {
                     </p>
 
                     <h2 className="text-3xl font-bold mt-2">
-                        {sales.reduce(
+                        {filteredSales.reduce(
                             (total, sale) =>
                                 total +
                                 sale.items.reduce(
@@ -359,7 +468,7 @@ function Reports() {
                     </h2>
                 </div>
 
-                {sales.length === 0 ? (
+                {filteredSales.length === 0 ? (
                     <div className="p-10 text-center text-gray-500">
                         No sales found.
                     </div>
@@ -398,7 +507,7 @@ function Reports() {
 
                             <tbody>
 
-                                {sales.map((sale) => (
+                                {filteredSales.map((sale) => (
                                     <tr
                                         key={sale._id}
                                         className="border-t hover:bg-gray-50"
