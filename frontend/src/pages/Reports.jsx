@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
     LineChart,
     Line,
@@ -137,6 +139,133 @@ function Reports() {
             link.remove();
 
             URL.revokeObjectURL(url);
+    };
+
+    const handleExportPDF = () => {
+        if (filteredSales.length === 0) {
+            alert("No sales available to export.");
+            return;
+        }
+
+        const doc = new jsPDF();
+
+        const totalRevenue = filteredSales.reduce(
+            (total, sale) => total + sale.total,
+            0
+        );
+
+        const totalCost = filteredSales.reduce(
+            (total, sale) => 
+                total +
+                sale.items.reduce(
+                    (itemTotal, item) =>
+                        itemTotal + item.costPrice * item.quantity,
+                    0
+                ),
+            0
+        );
+
+        const totalProfit = totalRevenue - totalCost;
+
+        doc.setFontSize(20);
+        doc.text("StockFlow Sales Report", 14, 20);
+
+        doc.setFontSize(10);
+        doc.text(
+            `Generated: ${new Date().toLocaleDateString()}`,
+            14,
+            29
+        );
+
+        const filterLabels = {
+            all: "All Time",
+            today: "Today",
+            "7days": "Last 7 Days",
+            "30days": "Last 30 Days",
+            custom: "Custom Range",
+        };
+
+        doc.text(
+            `Selected Period: ${filterLabels[dateFilter] || "All Time"}`,
+            14,
+            36
+        );
+
+        doc.setFontSize(12);
+        doc.text(
+            `Total Bills: ${filteredSales.length}`,
+            14, 
+            48
+        );
+        doc.text(
+            `Revenue: ${totalRevenue.toFixed(2)}`,
+            14,
+            56
+        );
+        doc.text(
+            `Cost: ${totalCost.toFixed(2)}`,
+            14,
+            64
+        );
+        doc.text(
+            `Profit: ${totalProfit.toFixed(2)}`,
+            14,
+            72
+        );
+
+        const rows = filteredSales.map((sale) => {
+            const cost = sale.items.reduce(
+                (total, item) =>
+                    total + item.costPrice * item.quantity,
+                0
+            );
+
+            const items = sale.items
+                .map(
+                    (item) =>
+                        `${item.name} (Qty: ${item.quantity})`
+                )
+                .join(", ");
+            
+            return [
+                new Date(sale.createdAt).toLocaleDateString(),
+                sale.customerName || "Walk-in Customer",
+                items,
+                `Rs. ${Number(sale.total).toFixed(2)}`,
+                `Rs. ${cost.toFixed(2)}`,
+                `Rs. ${(sale.total - cost).toFixed(2)}`,
+            ];
+        });
+
+        autoTable(doc, {
+            startY: 82,
+            head: [[
+                "Date",
+                "Customer",
+                "Items",
+                "Revenue",
+                "Cost",
+                "Profit",
+            ]],
+            body: rows,
+            styles: {
+                fontSize: 8,
+                cellPadding: 3,
+                overflow: "linebreak",
+            },
+            headStyles: {
+                fillColor: [37, 99, 235],
+            },
+            columnStyles: {
+                2: { cellWidth: 45 },
+            },
+        });
+
+        doc.save(
+            `StockFlow-Sale-Report-${new Date()
+                .toISOString()
+                .slice(0, 10)}.pdf`
+        );
     };
 
     const todaySales = sales.filter(
@@ -329,15 +458,24 @@ function Reports() {
                 </div>
             </div>
 
-            {/* Export CSV Button */}
-            <div className="flex justify-end mb-6">
+            
+            {/* Export Buttons */}
+            <div className="flex justify-end gap-3 mb-6">
                 <button
                     onClick={handleExportCSV}
                     className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2.5 rounded-lg shadow transition-colors"
                 >
                     Export CSV
                 </button>
+
+                <button     
+                    onClick={handleExportPDF}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded-lg shadow transition-colors"
+                >
+                    Export PDF
+                </button>
             </div>
+
 
             {/* Summary */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
