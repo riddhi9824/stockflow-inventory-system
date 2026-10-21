@@ -72,6 +72,73 @@ function Reports() {
         return true;
     });
 
+    const handleExportCSV = () => {
+        if (filteredSales.length === 0) {
+            alert("No sales available to export.");
+            return;
+        }
+
+        const headers = [
+            "Sale Date",
+            "Customer",
+            "Items Sold",
+            "Revenue",
+            "Cost",
+            "Profit",
+        ];
+
+        const rows = filteredSales.map((sale) => {
+            const cost = sale.items.reduce(
+                (total, item) =>
+                    total + item.costPrice * item.quantity,
+                0
+            );
+
+            const itemsSold = sale.items
+                .map((item) => `${item.name} (Qty: ${item.quantity})`)
+                .join("; ");
+
+            return [
+                new Date(sale.createdAt).toLocaleDateString(),
+                sale.customerName || "Walk-in Customer",
+                itemsSold,
+                sale.total,
+                cost,
+                sale.total - cost,
+            ];
+        });
+
+        const csvContent = [headers, ...rows]
+            .map((row) =>
+                row
+                    .map(
+                        (value) =>
+                            `"${String(value ?? "").replace(/"/g, '""')}"`
+                    )
+                    .join(",")
+            )
+            .join("\r\n");
+
+            const blob = new Blob(
+                ["\uFEFF" + csvContent],
+                { type: "text/csv;charset=utf-8;" }
+            );
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.download = `StockFlow-Sales-Report-${new Date()
+                .toISOString()
+                .slice(0, 10)}.csv`;
+            
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            URL.revokeObjectURL(url);
+    };
+
     const todaySales = sales.filter(
         (sale) => 
             new Date(sale.createdAt).toLocaleDateString() === today
@@ -260,6 +327,16 @@ function Reports() {
                         </>
                     )}
                 </div>
+            </div>
+
+            {/* Export CSV Button */}
+            <div className="flex justify-end mb-6">
+                <button
+                    onClick={handleExportCSV}
+                    className="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2.5 rounded-lg shadow transition-colors"
+                >
+                    Export CSV
+                </button>
             </div>
 
             {/* Summary */}
