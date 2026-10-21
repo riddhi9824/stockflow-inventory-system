@@ -185,8 +185,13 @@ function Reports() {
             custom: "Custom Range",
         };
 
+        const selectedPeriod = 
+            dateFilter === "custom" && startDate && endDate
+                ? `${startDate} to ${endDate}`
+                : filterLabels[dateFilter] || "All Time";
+
         doc.text(
-            `Selected Period: ${filterLabels[dateFilter] || "All Time"}`,
+            `Selected Period: ${selectedPeriod}`,
             14,
             36
         );
