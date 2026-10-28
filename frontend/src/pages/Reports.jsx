@@ -405,6 +405,10 @@ function Reports() {
                 <p className="text-gray-500 mt-1">
                     View all completed sales and bills
                 </p>
+
+                <p className="text-sm text-gray-500 mt-2">
+                    Report generated: {new Date().toLocaleString()}
+                </p>
             </div>
 
             {/* Date Range Filter */}
