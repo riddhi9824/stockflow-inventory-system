@@ -479,6 +479,13 @@ function Reports() {
                 >
                     Export PDF
                 </button>
+
+                <button
+                    onClick={() => window.print()}
+                    className="bg-gray-700 hover:bg-gray-800 text-white font-medium px-5 py-2.5 rounded-lg shadow transition-colors"
+                >
+                    Print Report
+                </button>
             </div>
 
 
