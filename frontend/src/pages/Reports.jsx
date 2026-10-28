@@ -492,6 +492,34 @@ function Reports() {
                 </button>
             </div>
 
+            {/* Print-Only Report Summary */}
+            <div className="hidden print:block mb-6">
+                <h2 className="text-xl font-bold mb-3">
+                    Sales Report Summary
+                </h2>
+
+                <p>
+                    <strong>Reporting Period:</strong>{" "}
+                    {dateFilter === "custom" && startDate && endDate
+                        ? `${startDate} to ${endDate}`
+                        : dateFilter === "today"
+                        ? "Today"
+                        : dateFilter === "7days"
+                        ? "Last 7 Days"
+                        : dateFilter === "30days"
+                        ? "Last 30 Days"
+                        : "All Time"}
+                </p>
+
+                <p>
+                    <strong>Total Bills:</strong> {filteredSales.length}
+                </p>
+
+                <p>
+                    <strong>Total Revenue:</strong> ₹{totalRevenue.toFixed(2)}
+                </p>
+            </div>
+
 
             {/* Summary */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
